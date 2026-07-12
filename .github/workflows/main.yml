@@ -7,12 +7,17 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
-    runs-on: ubuntu-latest
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        target: [Win64, Android32, Android64, macOS, iOS]
+        include:
+          - { name: Windows,    os: windows-latest, target: Win64 }
+          - { name: Android32,  os: ubuntu-latest,  target: Android32 }
+          - { name: Android64,  os: ubuntu-latest,  target: Android64 }
+          - { name: macOS,      os: macos-latest,   target: macOS }
+          - { name: iOS,        os: macos-latest,   target: iOS }
     
     steps:
       - uses: actions/checkout@v4
@@ -27,10 +32,9 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Co-Engine-${{ matrix.target }}
+          name: Co-Engine-${{ matrix.name }}
           path: ${{ steps.build.outputs.build-output }}/*.geode
 
-  # This job bundles everything into one final zip for you
   package:
     name: Create Release Package
     needs: build
@@ -44,11 +48,8 @@ jobs:
       - name: Create final bundle
         run: |
           mkdir -p final_release
+          # Flatten artifacts from subdirectories into one folder
           find artifacts -name "*.geode" -exec cp {} final_release/ \;
-          # Add extra docs if you create them later
-          [ -f about.md ] && cp about.md final_release/
-          [ -f changelog.md ] && cp changelog.md final_release/
-          
           cd final_release
           zip -r Co_Engine_Release.zip ./*
 
