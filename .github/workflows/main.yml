@@ -1,64 +1,26 @@
-name: Build Co Engine
+name: Detective Build
 
-on:
-  push:
-    branches: [ main, master ]
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 jobs:
-  build:
-    name: Build ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { name: Win64,     os: windows-latest, target: Win64 }
-          - { name: Android32, os: ubuntu-latest,  target: Android32 }
-          - { name: Android64, os: ubuntu-latest,  target: Android64 }
-          - { name: macOS,     os: macos-latest,   target: macOS }
-          - { name: iOS,       os: macos-latest,   target: iOS }
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build Geode Mod
-        id: build
-        uses: geode-sdk/build-geode-mod@main
-        with:
-          sdk: latest
-          target: ${{ matrix.target }}
-          combine: true
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Co-Engine-${{ matrix.name }}
-          path: ${{ steps.build.outputs.build-output }}/*.geode
-          if-no-files-found: error
-
-  package:
-    name: Package Release
-    needs: build
+  debug:
     runs-on: ubuntu-latest
     steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Flatten and Zip Artifacts
+      - uses: actions/checkout@v4
+      
+      # 1. Manually install Geode CLI
+      - name: Install Geode CLI
         run: |
-          mkdir -p final_release
-          find artifacts -name "*.geode" -exec cp {} final_release/ \;
-          cd final_release
-          zip -r Co-Engine-Release.zip ./*
-
-      - name: Upload Final Release Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: Co-Engine-Final-Package
-          path: final_release/Co-Engine-Release.zip
+          npm install -g @geode-sdk/cli
+          
+      # 2. Ask the CLI where it installed the SDK
+      - name: Locate SDK
+        run: |
+          echo "Listing Environment Variables:"
+          env | grep GEODE
+          echo "Where is Geode installed?"
+          geode sdk info || echo "Geode CLI not found"
+          
+      # 3. List the project files
+      - name: List Files
+        run: ls -R
