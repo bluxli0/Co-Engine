@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # --- THE FIX ---
-# Tell CMake to search the directory defined by the Geode action
+# We force CMake to look ONLY in the GEODE_SDK directory.
+# This bypasses the need for FindGeode.cmake and stops the 404 search error.
 if(DEFINED ENV{GEODE_SDK})
-    list(APPEND CMAKE_PREFIX_PATH "$ENV{GEODE_SDK}")
+    message(STATUS "Locating Geode at: $ENV{GEODE_SDK}")
+    find_package(Geode REQUIRED PATHS "$ENV{GEODE_SDK}" NO_DEFAULT_PATH)
+else()
+    # Fallback for local development if the env var isn't set
+    find_package(Geode REQUIRED)
 endif()
-
-find_package(Geode REQUIRED)
 
 # --- Everything Else ---
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
