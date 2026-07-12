@@ -1,13 +1,59 @@
-name: Build Mod
+name: Build Co Engine
 
 on:
   push:
-  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
-    uses: geode-sdk/build-geode-mod/.github/workflows/build.yml@main
-    with:
-      # Optional: Add any specific build flags here if needed
-      # upload-artifacts: true 
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [Win64, Android32, Android64, macOS, iOS]
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: latest
+          target: ${{ matrix.target }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Co-Engine-${{ matrix.target }}
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+
+  # This job bundles everything into one final zip for you
+  package:
+    name: Create Release Package
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all builds
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Create final bundle
+        run: |
+          mkdir -p final_release
+          find artifacts -name "*.geode" -exec cp {} final_release/ \;
+          # Add extra docs if you create them later
+          [ -f about.md ] && cp about.md final_release/
+          [ -f changelog.md ] && cp changelog.md final_release/
+          
+          cd final_release
+          zip -r Co_Engine_Release.zip ./*
+
+      - name: Upload Release Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Co_Engine_Complete_Release
+          path: final_release/Co_Engine_Release.zip
