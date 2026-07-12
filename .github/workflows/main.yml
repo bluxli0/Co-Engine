@@ -25,10 +25,6 @@ jobs:
         with:
           submodules: recursive
 
-      # 🌟 THE MISSING HANDSHAKE: This installs the CLI so CMake can find it
-      - name: Setup Geode CLI
-        uses: geode-sdk/setup-geode-cli@main
-
       - name: Build Geode Mod
         id: build
         uses: geode-sdk/build-geode-mod@main
@@ -43,3 +39,26 @@ jobs:
           name: Co-Engine-${{ matrix.name }}
           path: ${{ steps.build.outputs.build-output }}/*.geode
           if-no-files-found: error
+
+  package:
+    name: Package Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten and Zip Artifacts
+        run: |
+          mkdir -p final_release
+          find artifacts -name "*.geode" -exec cp {} final_release/ \;
+          cd final_release
+          zip -r Co-Engine-Release.zip ./*
+
+      - name: Upload Final Release Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Co-Engine-Final-Package
+          path: final_release/Co-Engine-Release.zip
