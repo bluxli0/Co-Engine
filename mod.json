@@ -1,0 +1,42 @@
+{
+    "geode": "5.8.0",
+    "id": "procedural.architect.co_engine",
+    "version": "1.0.0",
+    "name": "Co Engine",
+    "developer": "Architect Dev Team",
+    "description": "An advanced procedural generation suite, multi-track timeline architect, and keyframe engine for Geometry Dash 2.2.",
+    "repository": "https://github.com/your-username/co-engine",
+    "dependencies": [],
+    "settings": {
+        "floating-icon-size": {
+            "name": "Floating Menu Scale",
+            "description": "Adjust the scale of the floating circle ✐ button in the editor UI.",
+            "type": "float",
+            "default": 0.6,
+            "min": 0.3,
+            "max": 1.2
+        },
+        "auto-ldm-default": {
+            "name": "Default Optimizer Depth",
+            "description": "Sets the default pass filtering logic when using the quick optimizer tool.",
+            "type": "string",
+            "default": "Basic",
+            "match": "(Basic|Heavy|Aggressive)"
+        }
+    },
+    "resources": {
+        "spritesheets": {
+            "PSM_Sheet": [
+                "resources/PSM_Sheet.png"
+            ]
+        }
+    },
+    "tags": ["editor", "utility", "enhancement"],
+    "platforms": {
+        "windows": true,
+        "android32": true,
+        "android64": true,
+        "macos": true,
+        "ios": true
+    }
+}
