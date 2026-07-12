@@ -32,6 +32,8 @@ jobs:
           sdk: latest
           target: ${{ matrix.target }}
           combine: true
+          # FORCE CMake to see the Geode directory provided by the action
+          cmake-args: -DGeode_DIR=${{ env.GEODE_SDK }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -53,9 +55,7 @@ jobs:
       - name: Flatten and Zip Artifacts
         run: |
           mkdir -p final_release
-          # Copy all .geode files from the subfolders into one folder
           find artifacts -name "*.geode" -exec cp {} final_release/ \;
-          # Zip it up
           cd final_release
           zip -r Co-Engine-Release.zip ./*
 
