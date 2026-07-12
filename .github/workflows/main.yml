@@ -1,6 +1,9 @@
-name: Build and Debug
+name: Build Co Engine
 
-on: [workflow_dispatch]
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,9 +14,15 @@ jobs:
       matrix:
         include:
           - { name: Win64,     os: windows-latest, target: Win64 }
+          - { name: Android32, os: ubuntu-latest,  target: Android32 }
+          - { name: Android64, os: ubuntu-latest,  target: Android64 }
+          - { name: macOS,     os: macos-latest,   target: macOS }
+          - { name: iOS,       os: macos-latest,   target: iOS }
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Build Geode Mod
         id: build
@@ -23,13 +32,9 @@ jobs:
           target: ${{ matrix.target }}
           combine: true
 
-      # 🔍 THIS IS THE DETECTIVE STEP
-      - name: Debug Environment Variables
+      # This prints the SDK path so we can fix the CMake logic
+      - name: Verify SDK Path
         if: always()
         run: |
-          echo "--- GEODE_SDK PATH ---"
-          echo "$GEODE_SDK"
-          echo "--- LISTING SDK DIRECTORY ---"
-          ls -R "$GEODE_SDK" || echo "SDK directory is empty or missing!"
-          echo "--- ENVIRONMENT VARIABLES ---"
-          env | grep GEODE
+          echo "GEODE_SDK is: $GEODE_SDK"
+          ls -R "$GEODE_SDK" || echo "SDK path is empty!"
