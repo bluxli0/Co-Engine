@@ -1,26 +1,35 @@
-name: Detective Build
+name: Build and Debug
 
 on: [workflow_dispatch]
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Win64,     os: windows-latest, target: Win64 }
+
     steps:
       - uses: actions/checkout@v4
-      
-      # 1. Manually install Geode CLI
-      - name: Install Geode CLI
+
+      - name: Build Geode Mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: latest
+          target: ${{ matrix.target }}
+          combine: true
+
+      # 🔍 THIS IS THE DETECTIVE STEP
+      - name: Debug Environment Variables
+        if: always()
         run: |
-          npm install -g @geode-sdk/cli
-          
-      # 2. Ask the CLI where it installed the SDK
-      - name: Locate SDK
-        run: |
-          echo "Listing Environment Variables:"
+          echo "--- GEODE_SDK PATH ---"
+          echo "$GEODE_SDK"
+          echo "--- LISTING SDK DIRECTORY ---"
+          ls -R "$GEODE_SDK" || echo "SDK directory is empty or missing!"
+          echo "--- ENVIRONMENT VARIABLES ---"
           env | grep GEODE
-          echo "Where is Geode installed?"
-          geode sdk info || echo "Geode CLI not found"
-          
-      # 3. List the project files
-      - name: List Files
-        run: ls -R
