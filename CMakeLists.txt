@@ -10,7 +10,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 # 2. Modern Geode Mod Definition
 # This command automatically handles linking, library creation, and SDK integration
-add_geode_mod(
+setup_geode_mod(
     procedural.architect.co_engine
     SOURCES ${SOURCES}
     RESOURCES 
