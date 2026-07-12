@@ -1,0 +1,13 @@
+name: Build Mod
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: geode-sdk/build-geode-mod/.github/workflows/build.yml@main
+    with:
+      # Optional: Add any specific build flags here if needed
+      # upload-artifacts: true 
