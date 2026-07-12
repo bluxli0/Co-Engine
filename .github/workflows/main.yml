@@ -7,18 +7,18 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.name }}
+    name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { name: Windows,    os: windows-latest, target: Win64 }
-          - { name: Android32,  os: ubuntu-latest,  target: Android32 }
-          - { name: Android64,  os: ubuntu-latest,  target: Android64 }
-          - { name: macOS,      os: macos-latest,   target: macOS }
-          - { name: iOS,        os: macos-latest,   target: iOS }
-    
+          - { name: Windows,   os: windows-latest, target: Win64 }
+          - { name: Android32, os: ubuntu-latest,  target: Android32 }
+          - { name: Android64, os: ubuntu-latest,  target: Android64 }
+          - { name: macOS,     os: macos-latest,   target: macOS }
+          - { name: iOS,       os: macos-latest,   target: iOS }
+
     steps:
       - uses: actions/checkout@v4
 
@@ -28,15 +28,16 @@ jobs:
         with:
           sdk: latest
           target: ${{ matrix.target }}
+          combine: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Co-Engine-${{ matrix.name }}
+          name: Co-Engine-${{ matrix.target }}
           path: ${{ steps.build.outputs.build-output }}/*.geode
 
   package:
-    name: Create Release Package
+    name: Package
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -45,10 +46,9 @@ jobs:
         with:
           path: artifacts
       
-      - name: Create final bundle
+      - name: Create final zip
         run: |
           mkdir -p final_release
-          # Flatten artifacts from subdirectories into one folder
           find artifacts -name "*.geode" -exec cp {} final_release/ \;
           cd final_release
           zip -r Co_Engine_Release.zip ./*
@@ -56,5 +56,5 @@ jobs:
       - name: Upload Release Package
         uses: actions/upload-artifact@v4
         with:
-          name: Co_Engine_Complete_Release
+          name: Co_Engine_Release
           path: final_release/Co_Engine_Release.zip
