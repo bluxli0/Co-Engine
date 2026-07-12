@@ -7,54 +7,104 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { name: Windows,   os: windows-latest, target: Win64 }
-          - { name: Android32, os: ubuntu-latest,  target: Android32 }
-          - { name: Android64, os: ubuntu-latest,  target: Android64 }
-          - { name: macOS,     os: macos-latest,   target: macOS }
-          - { name: iOS,       os: macos-latest,   target: iOS }
+          - { name: Windows-Debug, os: windows-latest, target: Win64,    flavor: debug }
+          - { name: Windows-Slim,  os: windows-latest, target: Win64,    flavor: slim  }
+          - { name: Android32-Debug, os: ubuntu-latest, target: Android32, flavor: debug }
+          - { name: Android32-Slim,  os: ubuntu-latest, target: Android32, flavor: slim  }
+          - { name: Android64-Debug, os: ubuntu-latest, target: Android64, flavor: debug }
+          - { name: Android64-Slim,  os: ubuntu-latest, target: Android64, flavor: slim  }
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Build Mod
+      - name: Build
         id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: latest
           target: ${{ matrix.target }}
+          build-config: ${{ matrix.flavor == 'debug' && 'RelWithDebInfo' || 'Release' }}
+          use-lto:      ${{ matrix.flavor == 'slim' }}
+          export-pdb:   ${{ matrix.target == 'Win64' && matrix.flavor == 'debug' }}
+          bundle-pdb:   ${{ matrix.target == 'Win64' && matrix.flavor == 'debug' }}
+          export-debug: ${{ startsWith(matrix.target, 'Android') && matrix.flavor == 'debug' }}
           combine: true
 
-      - name: Upload Artifact
+      - name: Upload .geode
         uses: actions/upload-artifact@v4
         with:
-          name: Co-Engine-${{ matrix.target }}
+          name: geode-${{ matrix.name }}
           path: ${{ steps.build.outputs.build-output }}/*.geode
 
-  package:
-    name: Package
-    needs: build
+  package-debug:
+    name: Package Debug Pack
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all builds
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      
-      - name: Create final zip
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - run: sudo apt-get update && sudo apt-get install -y jq
+      - id: meta
         run: |
-          mkdir -p final_release
-          find artifacts -name "*.geode" -exec cp {} final_release/ \;
-          cd final_release
-          zip -r Co_Engine_Release.zip ./*
-
-      - name: Upload Release Package
-        uses: actions/upload-artifact@v4
+          NAME="Co-Engine" # Explicitly setting Co-Engine name
+          VER=$(jq -r '.version' mod.json | sed 's/^v//')
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "ver=$VER" >> $GITHUB_OUTPUT
+      - run: |
+          mkdir -p release-debug
+          for a in artifacts/*-Debug; do
+            [ -d "$a" ] || continue
+            for f in "$a"/*.geode; do
+              base=$(basename "$a")
+              cp "$f" "release-debug/${{ steps.meta.outputs.name }}_${{ steps.meta.outputs.ver }}_${base}.geode"
+            done
+          done
+          [ -d resources ] && cp -r resources release-debug/resources || true
+      - run: |
+          cd release-debug
+          zip -r "${{ steps.meta.outputs.name }}_${{ steps.meta.outputs.ver }}_Debug_Pack.zip" ./*
+      - uses: actions/upload-artifact@v4
         with:
-          name: Co_Engine_Release
-          path: final_release/Co_Engine_Release.zip
+          name: ${{ steps.meta.outputs.name }}_Debug_Pack
+          path: release-debug/*.zip
+
+  package-slim:
+    name: Package Slim Pack
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - run: sudo apt-get update && sudo apt-get install -y jq
+      - id: meta
+        run: |
+          NAME="Co-Engine"
+          VER=$(jq -r '.version' mod.json | sed 's/^v//')
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "ver=$VER" >> $GITHUB_OUTPUT
+      - run: |
+          mkdir -p release-slim
+          for a in artifacts/*-Slim; do
+            [ -d "$a" ] || continue
+            for f in "$a"/*.geode; do
+              base=$(basename "$a")
+              cp "$f" "release-slim/${{ steps.meta.outputs.name }}_${{ steps.meta.outputs.ver }}_${base}.geode"
+            done
+          done
+          [ -d resources ] && cp -r resources release-slim/resources || true
+      - run: |
+          cd release-slim
+          zip -r "${{ steps.meta.outputs.name }}_${{ steps.meta.outputs.ver }}_Slim_Pack.zip" ./*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.name }}_Slim_Pack
+          path: release-slim/*.zip
