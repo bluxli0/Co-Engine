@@ -5,8 +5,7 @@
 
 using namespace geode::prelude;
 
-// Changed from geode::Popup<> to FLAlertLayer (like BossFightEditor)
-// FLAlertLayer is more stable and has better API support
+// FLAlertLayer is the standard GD 2.2 alert/popup layer
 class MainDashboardLayer : public FLAlertLayer {
 protected:
     bool init() override;

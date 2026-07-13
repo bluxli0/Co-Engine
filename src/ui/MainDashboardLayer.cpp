@@ -4,20 +4,20 @@
 #include "../core/UndoManager.hpp"
 
 bool MainDashboardLayer::init() {
-    // Use FLAlertLayer::init like BossFightEditor does
-    // Params: parentLayer, title, btnBkg, closeBtnSrc, width, closable
-    if (!FLAlertLayer::init(nullptr, "Co Engine Pro Dashboard", "Close", nullptr, 400.f, false)) {
+    // FLAlertLayer::init only takes opacity parameter
+    // We'll set up the popup with default settings and customize via setTitle
+    if (!FLAlertLayer::init(0)) {
         return false;
     }
+    
+    this->setTitle("Co Engine Pro Dashboard");
 
-    auto winSize = CCDirector::sharedDirector()->getWinSize();
     auto menu = CCMenu::create();
     
     // 1. Generate Wave Button
-    // FIX: CCMenuItemSpriteExtra::create needs 4 params: sprite, selectedSprite, target, selector
     auto waveBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Generate Wave", "goldFont.fnt", "GJ_button_01.png"),
-        ButtonSprite::create("Generate Wave", "goldFont.fnt", "GJ_button_01.png"),  // selectedSprite
+        ButtonSprite::create("Generate Wave", "goldFont.fnt", "GJ_button_01.png"),
         this,
         menu_selector(MainDashboardLayer::onGenerateWave)
     );
@@ -27,7 +27,7 @@ bool MainDashboardLayer::init() {
     // 2. Undo Button
     auto undoBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),
-        ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),  // selectedSprite
+        ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),
         this,
         menu_selector(MainDashboardLayer::onUndo)
     );
@@ -37,7 +37,7 @@ bool MainDashboardLayer::init() {
     // 3. Optimizer Button
     auto optBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Optimize Level", "goldFont.fnt", "GJ_button_02.png"),
-        ButtonSprite::create("Optimize Level", "goldFont.fnt", "GJ_button_02.png"),  // selectedSprite
+        ButtonSprite::create("Optimize Level", "goldFont.fnt", "GJ_button_02.png"),
         this,
         menu_selector(MainDashboardLayer::onOptimizeLevel)
     );
@@ -54,7 +54,6 @@ bool MainDashboardLayer::init() {
     advBtn->setPosition({0, -50});
     menu->addChild(advBtn);
 
-    // FIX: Use m_mainLayer like FLAlertLayer provides
     this->m_mainLayer->addChild(menu);
     return true;
 }
