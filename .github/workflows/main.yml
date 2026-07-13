@@ -13,7 +13,7 @@ jobs:
           - { name: Win64,     os: windows-latest, target: Win64 }
           - { name: Android32, os: ubuntu-latest,  target: Android32 }
           - { name: Android64, os: ubuntu-latest,  target: Android64 }
-          - { name: macOS,     os: macos-latest,   target: macOS }
+          - { name: macOS,     os: macos-latest,   target: MacOS }
           - { name: iOS,       os: macos-latest,   target: iOS }
 
     steps:
