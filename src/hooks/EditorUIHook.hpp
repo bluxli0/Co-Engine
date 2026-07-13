@@ -8,9 +8,7 @@ using namespace geode::prelude;
 
 class PSMEditorUI : public Modify<PSMEditorUI, EditorUI> {
 public:
-    // 2.2 requires the specific signature found in EditorUI.hpp
-    bool init(LevelEditorLayer* lel) override;
-    
+    bool init(LevelEditorLayer* lel); 
     void onOpenDashboard(CCObject* sender);
     void updateDashboardButtonState();
 };
