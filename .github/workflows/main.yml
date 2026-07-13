@@ -10,17 +10,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: Win64,     os: windows-latest, target: Win64 }
-          - { name: Android32, os: ubuntu-latest,  target: Android32 }
-          - { name: Android64, os: ubuntu-latest,  target: Android64 }
-          - { name: macOS,     os: macos-latest,   target: macOS }
-          - { name: iOS,       os: macos-latest,   target: iOS }
+          - { name: Win64,     os: windows-latest, target: Win64,     platform: win }
+          - { name: Android32, os: ubuntu-latest,  target: Android32, platform: android }
+          - { name: Android64, os: ubuntu-latest,  target: Android64, platform: android }
+          - { name: macOS,     os: macos-latest,   target: macOS,     platform: mac }
+          - { name: iOS,       os: macos-latest,   target: iOS,       platform: ios }
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Geode Mod
-        uses: geode-sdk/build-geode-mod@main
-        with:
-          sdk: latest
-          target: ${{ matrix.target }}
+        run: geode build --platform ${{ matrix.platform }}
