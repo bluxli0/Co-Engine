@@ -2,13 +2,14 @@
 #define MainDashboardLayer_hpp
 
 #include <Geode/Geode.hpp>
-#include <Geode/ui/Popup.hpp>
 
 using namespace geode::prelude;
 
-class MainDashboardLayer : public geode::Popup<> {
+// Changed from geode::Popup<> to FLAlertLayer (like BossFightEditor)
+// FLAlertLayer is more stable and has better API support
+class MainDashboardLayer : public FLAlertLayer {
 protected:
-    bool setup() override;
+    bool init() override;
 
     void onGenerateWave(CCObject* sender);
     void onUndo(CCObject* sender);

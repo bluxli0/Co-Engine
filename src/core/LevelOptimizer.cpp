@@ -37,7 +37,9 @@ void LevelOptimizer::compileLDMPreset(LevelEditorLayer* editor) {
         auto obj = static_cast<GameObject*>(objects->objectAtIndex(i));
         
         if (isObjectDecorative(obj)) {
-            obj->setObjectLowDetail(true); // 2.2 native LDM
+            // FIX: Use m_lowDetailMode property instead of setObjectLowDetail()
+            // This is the correct GD 2.2 API for marking objects as low detail
+            obj->m_lowDetailMode = true;
         }
     }
 }

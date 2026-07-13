@@ -1,35 +1,43 @@
 #include "MainDashboardLayer.hpp"
-#include "../core/ProceduralGenerator.hpp" // Changed from .cpp to .hpp
+#include "../core/ProceduralGenerator.hpp"
 #include "../core/LevelOptimizer.hpp"
-#include "../core/UndoManager.hpp"         // 1. Added UndoManager
+#include "../core/UndoManager.hpp"
 
-bool MainDashboardLayer::setup() {
-    this->setTitle("Co Engine Pro Dashboard");
+bool MainDashboardLayer::init() {
+    // Use FLAlertLayer::init like BossFightEditor does
+    // Params: parentLayer, title, btnBkg, closeBtnSrc, width, closable
+    if (!FLAlertLayer::init(nullptr, "Co Engine Pro Dashboard", "Close", nullptr, 400.f, false)) {
+        return false;
+    }
 
     auto winSize = CCDirector::sharedDirector()->getWinSize();
     auto menu = CCMenu::create();
     
     // 1. Generate Wave Button
+    // FIX: CCMenuItemSpriteExtra::create needs 4 params: sprite, selectedSprite, target, selector
     auto waveBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Generate Wave", "goldFont.fnt", "GJ_button_01.png"),
+        ButtonSprite::create("Generate Wave", "goldFont.fnt", "GJ_button_01.png"),  // selectedSprite
         this,
         menu_selector(MainDashboardLayer::onGenerateWave)
     );
-    waveBtn->setPosition({-80, 40}); // Shifted left
+    waveBtn->setPosition({-80, 40});
     menu->addChild(waveBtn);
 
-    // 2. Undo Button (NEW)
+    // 2. Undo Button
     auto undoBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),
+        ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),  // selectedSprite
         this,
         menu_selector(MainDashboardLayer::onUndo)
     );
-    undoBtn->setPosition({80, 40}); // Shifted right
+    undoBtn->setPosition({80, 40});
     menu->addChild(undoBtn);
 
     // 3. Optimizer Button
     auto optBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Optimize Level", "goldFont.fnt", "GJ_button_02.png"),
+        ButtonSprite::create("Optimize Level", "goldFont.fnt", "GJ_button_02.png"),  // selectedSprite
         this,
         menu_selector(MainDashboardLayer::onOptimizeLevel)
     );
@@ -46,27 +54,35 @@ bool MainDashboardLayer::setup() {
     advBtn->setPosition({0, -50});
     menu->addChild(advBtn);
 
+    // FIX: Use m_mainLayer like FLAlertLayer provides
     this->m_mainLayer->addChild(menu);
     return true;
 }
 
 void MainDashboardLayer::onGenerateWave(CCObject* sender) {
     auto editor = LevelEditorLayer::get();
-    // Setup dummy settings (You can link these to UI sliders later)
-    GenerationSettings settings = { 1.0f, true, 500, 12345 };
+    if (!editor) {
+        log::warn("LevelEditorLayer not available");
+        return;
+    }
     
+    GenerationSettings settings = { 1.0f, true, 500, 12345 };
     ProceduralGenerator::shared()->generateProceduralArea(editor, "SinuousPath", 100.0f, 500.0f, settings);
     Notification::create("Generated SinuousPath", NotificationIcon::Success)->show();
 }
 
 void MainDashboardLayer::onUndo(CCObject* sender) {
     auto editor = LevelEditorLayer::get();
+    if (!editor) return;
+    
     UndoManager::shared()->undoLastAction(editor);
     Notification::create("Undo successful", NotificationIcon::Info)->show();
 }
 
 void MainDashboardLayer::onOptimizeLevel(CCObject* sender) {
     auto editor = LevelEditorLayer::get();
+    if (!editor) return;
+    
     LevelOptimizer::sharedState()->runOptimizationPass(editor);
     this->updateMenuDisplay();
 }
@@ -82,7 +98,7 @@ void MainDashboardLayer::updateMenuDisplay() {
 
 MainDashboardLayer* MainDashboardLayer::create() {
     auto ret = new MainDashboardLayer();
-    if (ret && ret->init(320.0f, 240.0f)) {
+    if (ret && ret->init()) {
         ret->autorelease();
         return ret;
     }
