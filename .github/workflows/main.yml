@@ -20,7 +20,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Geode Mod
+        id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: latest
           target: ${{ matrix.target }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Output-${{ matrix.name }}
+          path: ${{ steps.build.outputs.build-output }}
