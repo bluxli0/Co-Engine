@@ -12,13 +12,11 @@ bool PSMEditorUI::init(LevelEditorLayer* lel) {
         btn->setID("psm-launcher-button"_spr);
         menu->addChild(btn);
         menu->updateLayout();
-        log::info("Co Engine: UI launcher injected successfully.");
     }
     return true;
 }
 
 void PSMEditorUI::onOpenDashboard(CCObject* sender) {
-    if (auto dashboard = MainDashboardLayer::create()) {
-        dashboard->show();
-    }
+    // 2.2 uses open() for popups
+    MainDashboardLayer::create()->show(); 
 }
