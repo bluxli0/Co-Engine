@@ -17,6 +17,6 @@ bool PSMEditorUI::init(LevelEditorLayer* lel) {
 }
 
 void PSMEditorUI::onOpenDashboard(CCObject* sender) {
-    // 2.2 uses open() for popups
-    MainDashboardLayer::create()->show(); 
+    // 2.2+ popups use the open() method
+    MainDashboardLayer::create()->open();
 }
