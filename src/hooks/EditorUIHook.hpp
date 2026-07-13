@@ -1,15 +1,18 @@
-#ifndef EditorUIHook_hpp
-#define EditorUIHook_hpp
+#ifndef LevelEditorLayerHook_hpp
+#define LevelEditorLayerHook_hpp
 
 #include <Geode/Geode.hpp>
-#include <Geode/modify/EditorUI.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
 
 using namespace geode::prelude;
 
-class PSMEditorUI : public Modify<PSMEditorUI, EditorUI> {
+class PSMEditorLayer : public Modify<PSMEditorLayer, LevelEditorLayer> {
 public:
-    bool init(LevelEditorLayer* lel); 
-    void onOpenDashboard(CCObject* sender);
-    void updateDashboardButtonState();
+    void update(float dt); // Removed override
+    void createObject(int id, CCPoint pos, bool p2); // Removed override
+    ~PSMEditorLayer(); // Destructors are handled differently in 2.2
+
+    void onEditorClosed();
+    bool isOptimizationEnabled();
 };
 #endif
