@@ -10,9 +10,9 @@ class PSMEditorLayer : public Modify<PSMEditorLayer, LevelEditorLayer> {
 public:
     void update(float dt) override;
     void createObject(int id, CCPoint pos, bool p2) override;
-    void destructor() override;
+    // 2.2 bindings use ~LevelEditorLayer() for destructor hooks
+    void destructor() override; 
 
-    // Advanced Engine Hooks
     void onEditorClosed();
     bool isOptimizationEnabled();
 };
