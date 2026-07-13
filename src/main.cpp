@@ -14,6 +14,4 @@ $on_mod(Loaded) {
     log::info("Co Engine initialized: Procedural Suite resources registered.");
 }
 
-$on_mod(Unloaded) {
-    log::info("Co Engine shutting down: Clearing resources.");
-}
+// REMOVED the $on_mod(Unloaded) block because it is causing the compiler error.
