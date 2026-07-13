@@ -2,7 +2,7 @@
 #define MainDashboardLayer_hpp
 
 #include <Geode/Geode.hpp>
-#include <Geode/ui/Popup.hpp> // Essential include
+#include <Geode/ui/Popup.hpp>
 
 using namespace geode::prelude;
 
@@ -11,7 +11,7 @@ protected:
     bool setup() override;
 
     void onGenerateWave(CCObject* sender);
-    void onUndo(CCObject* sender); // Added missing declaration
+    void onUndo(CCObject* sender);
     void onOptimizeLevel(CCObject* sender);
     void onToggleAdvancedMode(CCObject* sender);
 
