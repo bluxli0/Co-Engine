@@ -13,13 +13,13 @@ void UndoManager::undoLastAction(LevelEditorLayer* editor) {
     if (m_history.empty()) return;
 
     auto lastAction = m_history.top();
-    auto objects = editor->m_objects;
+    auto objects = editor->getAllObjects();
 
-    // Remove only the objects created in the last action
     for (int id : lastAction.addedObjectIDs) {
         for (int i = objects->count() - 1; i >= 0; --i) {
             auto obj = static_cast<GameObject*>(objects->objectAtIndex(i));
-            if (obj->m_itemID == id) { // Using itemID as a unique reference
+            // Updated to m_objectID
+            if (obj->m_objectID == id) { 
                 editor->removeObject(obj, true);
                 break;
             }
