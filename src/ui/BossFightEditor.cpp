@@ -4,8 +4,11 @@
 #include "../core/LevelOptimizer.hpp"
 
 bool BossFightEditor::init() {
-    // Standard Geode Popup Setup
-    if (!FLAlertLayer::init(nullptr, "Boss Fight Pro Engine", "Close", nullptr, 450.f, false)) return false;
+    // FLAlertLayer::init requires all 9 parameters:
+    // delegate, title, desc, btn1, btn2, width, scroll, height, textScale
+    if (!FLAlertLayer::init(nullptr, "Boss Fight Pro Engine", "", "OK", nullptr, 450.0f, false, 200.0f, 1.0f)) {
+        return false;
+    }
 
     // Use a layout-aware container
     auto container = CCNode::create();
@@ -15,19 +18,25 @@ bool BossFightEditor::init() {
     // 1. Generate Button
     auto genBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Spawn Boss Path", "goldFont.fnt", "GJ_button_01.png"),
-        this, menu_selector(BossFightEditor::onGenerateBoss)
+        ButtonSprite::create("Spawn Boss Path", "goldFont.fnt", "GJ_button_01.png"),
+        this,
+        menu_selector(BossFightEditor::onGenerateBoss)
     );
     
     // 2. Undo Button
     auto undoBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),
-        this, menu_selector(BossFightEditor::onUndo)
+        ButtonSprite::create("Undo", "goldFont.fnt", "GJ_button_03.png"),
+        this,
+        menu_selector(BossFightEditor::onUndo)
     );
 
     // 3. Optimize Button
     auto optBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Optimize", "goldFont.fnt", "GJ_button_02.png"),
-        this, menu_selector(BossFightEditor::onOptimize)
+        ButtonSprite::create("Optimize", "goldFont.fnt", "GJ_button_02.png"),
+        this,
+        menu_selector(BossFightEditor::onOptimize)
     );
 
     auto menu = CCMenu::create();

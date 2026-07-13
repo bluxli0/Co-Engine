@@ -1,12 +1,12 @@
 #include "TimelineTrackEditor.hpp"
 
 bool TimelineTrackEditor::init() {
-    // Correct FLAlertLayer::init - takes params for parent, title, buttons, size
-    if (!FLAlertLayer::init(nullptr, "Timeline Track Editor", "OK", nullptr, 320.0f)) {
+    // FLAlertLayer::init requires all 9 parameters:
+    // delegate, title, desc, btn1, btn2, width, scroll, height, textScale
+    if (!FLAlertLayer::init(nullptr, "Timeline Track Editor", "", "OK", nullptr, 320.0f, false, 240.0f, 1.0f)) {
         return false;
     }
 
-    // FLAlertLayer handles setTitle in init, so we don't need to call it again
     auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // 1. Setup the track drawing area

@@ -4,13 +4,11 @@
 #include "../core/UndoManager.hpp"
 
 bool MainDashboardLayer::init() {
-    // FLAlertLayer::init only takes opacity parameter
-    // We'll set up the popup with default settings and customize via setTitle
-    if (!FLAlertLayer::init(0)) {
+    // FLAlertLayer::init requires all 9 parameters:
+    // delegate, title, desc, btn1, btn2, width, scroll, height, textScale
+    if (!FLAlertLayer::init(nullptr, "Co Engine Pro Dashboard", "", "OK", nullptr, 320.0f, false, 240.0f, 1.0f)) {
         return false;
     }
-    
-    this->setTitle("Co Engine Pro Dashboard");
 
     auto menu = CCMenu::create();
     
