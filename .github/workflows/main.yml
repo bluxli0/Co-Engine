@@ -18,11 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        # Removed submodules: recursive
 
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: latest
           target: ${{ matrix.target }}
-          combine: true
