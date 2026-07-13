@@ -1,9 +1,6 @@
 name: Build Co Engine
 
-on:
-  push:
-    branches: [ main, master ]
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -21,20 +18,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        # Removed submodules: recursive
 
       - name: Build Geode Mod
-        id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: latest
           target: ${{ matrix.target }}
           combine: true
-
-      # This prints the SDK path so we can fix the CMake logic
-      - name: Verify SDK Path
-        if: always()
-        run: |
-          echo "GEODE_SDK is: $GEODE_SDK"
-          ls -R "$GEODE_SDK" || echo "SDK path is empty!"
