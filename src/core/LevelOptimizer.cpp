@@ -37,9 +37,14 @@ void LevelOptimizer::compileLDMPreset(LevelEditorLayer* editor) {
         auto obj = static_cast<GameObject*>(objects->objectAtIndex(i));
         
         if (isObjectDecorative(obj)) {
-            // FIX: Use m_lowDetailMode property instead of setObjectLowDetail()
-            // This is the correct GD 2.2 API for marking objects as low detail
-            obj->m_lowDetailMode = true;
+            // TODO: Find the correct GD 2.2 API for setting low detail mode
+            // The property m_lowDetailMode doesn't exist on GameObject
+            // Look in the Geode bindings for the correct method/property
+            // Possible alternatives to investigate:
+            // - setLowDetailMode()
+            // - setDetailMode()
+            // - m_unk field
+            // - Other GameObject properties
         }
     }
 }
