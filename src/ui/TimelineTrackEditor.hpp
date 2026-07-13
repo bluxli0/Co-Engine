@@ -17,11 +17,11 @@ struct TimelineEvent {
 
 /**
  * TimelineTrackEditor manages the non-linear editing of procedural events.
- * It maps game-time to spatial coordinates.
+ * Inherits from FLAlertLayer to get m_mainLayer, setTitle, and CCNode scheduling methods.
  */
-class TimelineTrackEditor : public Popup<> {
+class TimelineTrackEditor : public FLAlertLayer {
 protected:
-    bool setup() override;
+    bool init() override;
 
     // --- Timeline Interaction ---
     void onPlay(CCObject* sender);
@@ -32,6 +32,7 @@ protected:
     // --- Rendering Helpers ---
     void renderTracks();
     void updateKeyframeVisuals();
+    void update(float dt) override;  // CCNode scheduling
 
 public:
     static TimelineTrackEditor* create();
